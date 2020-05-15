@@ -10,13 +10,70 @@
 <body style="text-align:center; background: linear-gradient(to right, #efefbb, #d4d3dd);">
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      Highcharts.theme = {
+        colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572',
+          '#FF9655', '#FFF263', '#6AF9C4'
+        ],
+        chart: {
+          backgroundColor: {
+            linearGradient: [0, 0, 500, 500],
+            stops: [
+              [0, 'rgb(255, 255, 255)'],
+              [1, 'rgb(240, 240, 255)']
+            ]
+          },
+        },
+        title: {
+          style: {
+            color: '#000',
+            font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+          }
+        },
+        subtitle: {
+          style: {
+            color: '#666666',
+            font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
+          }
+        },
+        legend: {
+          itemStyle: {
+            font: '9pt Trebuchet MS, Verdana, sans-serif',
+            color: 'black'
+          },
+          itemHoverStyle: {
+            color: 'gray'
+          }
+        }
+      };
+
+      Highcharts.setOptions(Highcharts.theme);
+      Highcharts.setOptions({
+        lang: {
+          months: [
+            'leden', 'únor', 'březen', 'duben',
+            'květen', 'červen', 'červenec', 'srpen',
+            'září', 'říjen', 'listopad', 'prosinec'
+          ],
+          weekdays: [
+            'neděle', 'pondělí', 'úterý', 'středa',
+            'čtvrtek', 'pátek', 'sobota'
+          ],
+          shortMonths: ['led', 'úno', 'bře', 'dub',
+            'kvě', 'čvn', 'čvc', 'srp',
+            'zář', 'říj', 'lis', 'pro'
+          ]
+        }
+      });
+
       $('#chart_voda').highcharts({
         data: {
           googleSpreadsheetKey: '1qeWoreLdArvyhD5fe8VxJE1-UUfK3qrDB4RQ1ks7SgQ',
-          googleSpreadsheetWorksheet: 2
+          googleSpreadsheetWorksheet: 2,
+          startColumn: 0,
+          endColumn: 1
         },
         chart: {
-            type: 'column'
+          type: 'column'
         },
         title: {
           text: 'Nádrž'
@@ -27,11 +84,77 @@
           min: 0
         },
         xAxis: {
-          type: 'datetime',
-          labels: {
-            format: '{value:%Y-%m-%d}',
-          }
+          type: 'datetime'
         }
+      });
+
+      var d = new Date();
+      d.setDate(d.getDate()-1);
+      $('#chart_teplota').highcharts({
+        data: {
+          googleSpreadsheetKey: '1qeWoreLdArvyhD5fe8VxJE1-UUfK3qrDB4RQ1ks7SgQ',
+          googleSpreadsheetWorksheet: 1,
+          startColumn: 0,
+          endColumn: 3,
+          enablePolling: true,
+          dataRefreshRate: 60
+        },
+        chart: {
+          type: 'line'
+        },
+        title: {
+          text: 'Teplota/Rychlost větru'
+        },
+        xAxis: {
+          type: 'datetime',
+          maxZoom: 48 * 3600 * 1000,
+          min: Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+        },
+        tooltip: {
+          shared: true
+        },
+        series: [{
+          type: 'line',
+          yAxis: 1
+        }, {
+          type: 'line',
+          yAxis: 1
+        }, {
+          type: 'line',
+          yAxis: 0
+        }],
+        yAxis: [{ // Primary yAxis
+          labels: {
+            format: '{value}°C',
+            style: {
+              color: Highcharts.getOptions().colors[2]
+            }
+          },
+          title: {
+            text: 'Teplota',
+            style: {
+              color: Highcharts.getOptions().colors[2]
+            }
+          },
+          opposite: false
+
+        }, { // Secondary yAxis
+          title: {
+            text: 'Rychlost/nárazy větru',
+            style: {
+              color: Highcharts.getOptions().colors[1]
+            }
+          },
+          labels: {
+            format: '{value} km/h',
+            style: {
+              color: Highcharts.getOptions().colors[1]
+            }
+          },
+          opposite: true
+
+        }]
+
       });
     });
   </script>
